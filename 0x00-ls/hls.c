@@ -29,12 +29,12 @@ int main(int argc, char **argv)
 		stat_response = lstat(read->d_name, &buf);
 		if (stat_response != 0)
 			fprintf(stderr, "error in lstat: %s\n", strerror(errno));
-		printf("%s", read->d_name);
+		printf("%s\n", read->d_name);
 		read = readdir(dir);
-		if (read != NULL)
-			printf(" ");
+		/* if (read != NULL) */
+		/*printf(" "); */
 	}
-	printf("\n");
+	/* printf("\n"); */
 
 	closedir(dir);
 	return (1);
