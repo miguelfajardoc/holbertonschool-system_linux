@@ -20,10 +20,10 @@ int main(int argc, char **argv)
 		dir = opendir(directory);
 		if (dir == NULL)
 		{
-			/*handle errors of directory*/
 			return (0);
 		}
 		read_file(dir, directory);
+		closedir(dir);
 	}
 	else
 		check_for_files(files_position, argv, argc);
@@ -43,11 +43,11 @@ int main(int argc, char **argv)
 				printf("%s:\n", directory);
 				read_file(dir, directory);
 			}
+			closedir(dir);
 		}
 		if (files_i + 1 < argc)
 			printf("\n");
 	}
-	closedir(dir);
 	return (1);
 }
 
@@ -103,6 +103,7 @@ int read_file(DIR *dir, char *dir_name)
 		{
 			fprintf(stderr, "hls: cannot access %s: %s\n", full_name,
 				strerror(errno));
+			free(buffer);
 			exit(0);
 		}
 		if (_strncmp(read->d_name, ".", 1) &&
@@ -115,6 +116,7 @@ int read_file(DIR *dir, char *dir_name)
 		read = readdir(dir);
 	}
 	printf("\n");
+	free(buffer);
 	return (1);
 }
 
