@@ -27,7 +27,6 @@ int main(int argc, char **argv)
 	}
 	else
 		check_for_files(files_position, argv, argc);
-
 	for (files_i = 1; files_i < argc; files_i++)
 	{
 		if (files_position[files_i] != 0)
@@ -45,7 +44,7 @@ int main(int argc, char **argv)
 				read_file(dir, directory);
 			}
 		}
-		if(files_i + 1 < argc)
+		if (files_i + 1 < argc)
 			printf("\n");
 	}
 	closedir(dir);
@@ -55,8 +54,8 @@ int main(int argc, char **argv)
 /**
  * check_for_files - This function check in the argv where in the argv are
  * the name of the directories or files to list
- * @files_position: pointer to an array of integers to fill where a directory or
- * file name is found
+ * @files_position: pointer to an array of integers to fill where a directory
+ * or file name is found
  * @argv: the pointer that points the input arguments
  * @argc: the amount of arguments of argv
  */
@@ -74,8 +73,8 @@ void check_for_files(int *files_position, char **argv, int argc)
 }
 
 /**
- * read_file  - This function read the directory and print the files accoding to
- * sended flags, if any
+ * read_file  - This function read the directory and print the files according
+ * to sended flags, if any
  * @dir: the DIR pointer that contains the stream of de directory
  * @dir_name: the name of the directory
  * Return: 1 on succes, other if any error found
@@ -85,8 +84,9 @@ int read_file(DIR *dir, char *dir_name)
 	struct stat buf;
 	int stat_response;
 	struct dirent *read;
-	char * restrict buffer = malloc(512);
-	char * full_name = dir_name;
+
+	char *restrict buffer = malloc(512);
+	char *full_name = dir_name;
 
 	read = readdir(dir);
 	while (read != NULL)
