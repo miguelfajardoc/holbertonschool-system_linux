@@ -29,9 +29,6 @@ int main(int argc, char **argv)
 		stat_response = lstat(read->d_name, &buf);
 		if (stat_response != 0)
 			fprintf(stderr, "error in lstat: %s\n", strerror(errno));
-
-		/* printf("%s compare to . = %d\n", read->d_name, strncmp(read->d_name, ".", 1)); */
-		/* printf("%s compare to .. = %d\n", read->d_name, strncmp(read->d_name, "..", 2)); */
 		if (strncmp(read->d_name, ".", 1) && strncmp(read->d_name, "..", 2))
 			printf("%s", read->d_name);
 		read = readdir(dir);
