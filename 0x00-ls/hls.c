@@ -11,28 +11,100 @@ int main(int argc, char **argv)
 {
 	DIR *dir;
 	char *directory;
-	struct dirent *read;
-	struct stat buf;
-	int stat_response;
+	int files_position[argc];
+	int files_i;
 
 	if (argc <= 1)
+	{
 		directory = ".";
+		dir = opendir(directory);
+		if (dir == NULL)
+		{
+			/*handle errors of directory*/
+			return (0);
+		}
+		read_file(dir, directory);
+	}
 	else
-		directory = argv[1];
+		check_for_files(files_position, argv, argc);
 
-	dir = opendir(directory);
-	if (dir == NULL)
-		return (0);
+	for (files_i = 1; files_i < argc; files_i++)
+	{
+		if (files_position[files_i] != 0)
+		{
+			directory = argv[files_i];
+			dir = opendir(directory);
+			if (dir == NULL)
+			{
+				fprintf(stderr, "hls: cannot access %s: %s\n",
+					directory, strerror(errno));
+			}
+			else
+			{
+				printf("%s:\n", directory);
+				read_file(dir, directory);
+			}
+		}
+		if(files_i + 1 < argc)
+			printf("\n");
+	}
+	closedir(dir);
+	return (1);
+}
+
+/**
+ * check_for_files - This function check in the argv where in the argv are
+ * the name of the directories or files to list
+ * @files_position: pointer to an array of integers to fill where a directory or
+ * file name is found
+ * @argv: the pointer that points the input arguments
+ * @argc: the amount of arguments of argv
+ */
+void check_for_files(int *files_position, char **argv, int argc)
+{
+	int iter;
+
+	for (iter = 1; iter < argc; iter++)
+	{
+		if (argv[iter][0] != '-')
+			files_position[iter] = 1;
+		else
+			files_position[iter] = 0;
+	}
+}
+
+/**
+ * read_file  - This function read the directory and print the files accoding to
+ * sended flags, if any
+ * @dir: the DIR pointer that contains the stream of de directory
+ * @dir_name: the name of the directory
+ * Return: 1 on succes, other if any error found
+ */
+int read_file(DIR *dir, char *dir_name)
+{
+	struct stat buf;
+	int stat_response;
+	struct dirent *read;
+	char * restrict buffer = malloc(512);
+	char * full_name = dir_name;
+
 	read = readdir(dir);
 	while (read != NULL)
 	{
-		stat_response = lstat(read->d_name, &buf);
+		if (dir_name[0] != '.')
+		{
+			sprintf(buffer, "./%s%s", dir_name, read->d_name);
+			full_name = buffer;
+			/* printf("reading: %s\n", buffer); */
+		}
+			/* printf("reading: %s\n", dir_name); */
+		stat_response = lstat(full_name, &buf);
 		if (stat_response != 0)
-			fprintf(stderr, "error in lstat: %s\n", strerror(errno));
-		/* printf("%s with '.' : %d\n", read->d_name, */
-		/* _strncmp(read->d_name, ".", 1)); */
-		/* printf("%s with '..' : %d\n", read->d_name, */
-		/* _strncmp(read->d_name, "..", 2)); */
+		{
+			fprintf(stderr, "hls: cannot access %s: %s\n", full_name,
+				strerror(errno));
+			exit(0);
+		}
 		if (_strncmp(read->d_name, ".", 1) &&
 		    _strncmp(read->d_name, "..", 2))
 		{
@@ -43,7 +115,6 @@ int main(int argc, char **argv)
 		read = readdir(dir);
 	}
 	printf("\n");
-	closedir(dir);
 	return (1);
 }
 
