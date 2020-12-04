@@ -14,4 +14,6 @@
 #include <pwd.h>
 #include <grp.h>
 
+int _strncmp(char *s1, char *s2, int n);
+
 #endif /* HLS_HEADER */
