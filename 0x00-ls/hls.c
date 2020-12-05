@@ -45,7 +45,6 @@ int open_directories(int argc, char **argv, int *files_position)
 {
 	DIR *dir;
 	int files_i;
-	char *errorBuffer;
 	char *directory;
 	int error;
 
@@ -62,12 +61,7 @@ int open_directories(int argc, char **argv, int *files_position)
 					printf("%s\n", directory);
 				else
 				{
-					errorBuffer = malloc(512);
-					sprintf(errorBuffer,
-						"hls: cannot access %s",
-						directory);
-					perror(errorBuffer);
-					free(errorBuffer);
+					error_handler(error, directory);
 				}
 			}
 			else
@@ -82,26 +76,6 @@ int open_directories(int argc, char **argv, int *files_position)
 			printf("\n");
 	}
 	return (1);
-}
-/**
- * check_for_files - This function check in the argv where in the argv are
- * the name of the directories or files to list
- * @files_position: pointer to an array of integers to fill where a directory
- * or file name is found
- * @argv: the pointer that points the input arguments
- * @argc: the amount of arguments of argv
- */
-void check_for_files(int *files_position, char **argv, int argc)
-{
-	int iter;
-
-	for (iter = 1; iter < argc; iter++)
-	{
-		if (argv[iter][0] != '-')
-			files_position[iter] = 1;
-		else
-			files_position[iter] = 0;
-	}
 }
 
 /**
@@ -154,28 +128,3 @@ int read_file(DIR *dir, char *dir_name)
 	return (1);
 }
 
-/**
- * _strncmp - This is like strncmp
- * @s1: the pointer that points first string
- * @s2: the pointer that points second string
- * @n: the number of letters to compare
- * Return: 0 if there equal
- */
-int _strncmp(char *s1, char *s2, int n)
-{
-	int iter;
-	int validator = 0;
-
-	for (iter = 0; iter < n; iter++)
-	{
-		/* printf("in strcmp %c and %c with iter: %d son %d\n",*/
-		/* s1[iter], s2[iter], iter, s1[iter] != s2[iter]); */
-		if (s1[iter] != s2[iter])
-		{
-			/* printf("entre\n"); */
-			validator = iter + 1;
-			break;
-		}
-	}
-	return (validator);
-}
