@@ -12,7 +12,7 @@ int main(int argc, char **argv)
 	DIR *dir;
 	char *directory;
 	int files_position[50];
-	int files_i;
+	int result;
 
 	if (argc <= 1)
 	{
@@ -26,7 +26,28 @@ int main(int argc, char **argv)
 		closedir(dir);
 	}
 	else
+	{
 		check_for_files(files_position, argv, argc);
+		result = open_directories(argc, argv, files_position);
+	}
+	return (result);
+}
+/**
+ * open_directories - this function open the directories to read from the argv
+ * and the files_position.
+ * @argv: the pointer that points the input arguments
+ * @argc: the amount of arguments of argv
+ * @files_position: pointer to an array of integers to fill where a directory
+ * or file name is found
+ * Return: 1 on sucess, 0 otherwise
+ */
+int open_directories(int argc, char **argv, int *files_position)
+{
+	DIR *dir;
+	int files_i;
+	char *errorBuffer;
+	char *directory;
+
 	for (files_i = 1; files_i < argc; files_i++)
 	{
 		if (files_position[files_i] != 0)
@@ -35,8 +56,11 @@ int main(int argc, char **argv)
 			dir = opendir(directory);
 			if (dir == NULL)
 			{
-				fprintf(stderr, "hls: cannot access %s: %s\n",
-					directory, strerror(errno));
+				errorBuffer = malloc(512);
+				sprintf(errorBuffer, "hls: cannot access %s: ",
+					directory);
+				perror(errorBuffer);
+				free(errorBuffer);
 			}
 			else
 			{
@@ -50,7 +74,6 @@ int main(int argc, char **argv)
 	}
 	return (1);
 }
-
 /**
  * check_for_files - This function check in the argv where in the argv are
  * the name of the directories or files to list
@@ -84,11 +107,10 @@ int read_file(DIR *dir, char *dir_name)
 	struct stat buf;
 	int stat_response;
 	struct dirent *read;
-	char *buffer;
+	char *buffer, *errorBuffer;
 	char *full_name = dir_name;
 
 	buffer = malloc(512);
-
 	if (buffer == NULL)
 		return (0);
 	read = readdir(dir);
@@ -98,15 +120,15 @@ int read_file(DIR *dir, char *dir_name)
 		{
 			sprintf(buffer, "./%s%s", dir_name, read->d_name);
 			full_name = buffer;
-			/* printf("reading: %s\n", buffer); */
 		}
-			/* printf("reading: %s\n", dir_name); */
 		stat_response = lstat(full_name, &buf);
 		if (stat_response != 0)
 		{
-			fprintf(stderr, "hls: cannot access %s: %s\n", full_name,
-				strerror(errno));
-			free(buffer);
+			errorBuffer = malloc(512);
+			sprintf(errorBuffer, "hls: cannot access %s: ",
+				buffer);
+			perror(errorBuffer);
+			free(errorBuffer), free(buffer);
 			return (0);
 		}
 		if (_strncmp(read->d_name, ".", 1) &&
