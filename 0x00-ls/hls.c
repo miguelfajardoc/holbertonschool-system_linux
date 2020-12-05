@@ -11,7 +11,7 @@ int main(int argc, char **argv)
 {
 	DIR *dir;
 	char *directory;
-	int files_position[argc];
+	int files_position[50];
 	int files_i;
 
 	if (argc <= 1)
@@ -84,10 +84,13 @@ int read_file(DIR *dir, char *dir_name)
 	struct stat buf;
 	int stat_response;
 	struct dirent *read;
-
-	char *restrict buffer = malloc(512);
+	char * buffer;
 	char *full_name = dir_name;
 
+	buffer = malloc(512);
+
+	if (buffer == NULL)
+		return(0);
 	read = readdir(dir);
 	while (read != NULL)
 	{
