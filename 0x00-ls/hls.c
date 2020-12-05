@@ -84,13 +84,13 @@ int read_file(DIR *dir, char *dir_name)
 	struct stat buf;
 	int stat_response;
 	struct dirent *read;
-	char * buffer;
+	char *buffer;
 	char *full_name = dir_name;
 
 	buffer = malloc(512);
 
 	if (buffer == NULL)
-		return(0);
+		return (0);
 	read = readdir(dir);
 	while (read != NULL)
 	{
