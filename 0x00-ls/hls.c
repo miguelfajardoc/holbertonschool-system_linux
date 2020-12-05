@@ -47,6 +47,7 @@ int open_directories(int argc, char **argv, int *files_position)
 	int files_i;
 	char *errorBuffer;
 	char *directory;
+	int error;
 
 	for (files_i = 1; files_i < argc; files_i++)
 	{
@@ -54,13 +55,20 @@ int open_directories(int argc, char **argv, int *files_position)
 		{
 			directory = argv[files_i];
 			dir = opendir(directory);
+			error = errno;
 			if (dir == NULL)
 			{
-				errorBuffer = malloc(512);
-				sprintf(errorBuffer, "hls: cannot access %s: ",
-					directory);
-				perror(errorBuffer);
-				free(errorBuffer);
+				if (error == ENOTDIR)
+					printf("%s\n", directory);
+				else
+				{
+					errorBuffer = malloc(512);
+					sprintf(errorBuffer,
+						"hls: cannot access %s",
+						directory);
+					perror(errorBuffer);
+					free(errorBuffer);
+				}
 			}
 			else
 			{
@@ -126,7 +134,7 @@ int read_file(DIR *dir, char *dir_name)
 		if (stat_response != 0)
 		{
 			errorBuffer = malloc(512);
-			sprintf(errorBuffer, "hls: cannot access %s: ",
+			sprintf(errorBuffer, "hls: cannot access %s",
 				buffer);
 			perror(errorBuffer);
 			free(errorBuffer), free(buffer);
