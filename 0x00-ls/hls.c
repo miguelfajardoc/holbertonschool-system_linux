@@ -64,7 +64,8 @@ int open_directories(int argc, char **argv, int *files_position)
 			}
 			else
 			{
-				printf("%s:\n", directory);
+				if (argc > 2)
+					printf("%s:\n", directory);
 				read_file(dir, directory);
 			}
 			closedir(dir);
@@ -118,7 +119,7 @@ int read_file(DIR *dir, char *dir_name)
 	{
 		if (dir_name[0] != '.')
 		{
-			sprintf(buffer, "./%s%s", dir_name, read->d_name);
+			sprintf(buffer, "./%s/%s", dir_name, read->d_name);
 			full_name = buffer;
 		}
 		stat_response = lstat(full_name, &buf);
