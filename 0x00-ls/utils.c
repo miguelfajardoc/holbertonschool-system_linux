@@ -39,6 +39,8 @@ void error_handler(int _errno, char *file_error)
 
 	if (_errno == EACCES)
 		errorString = permissionError;
+	else
+		errorString = accessError;
 	errorBuffer = malloc(512);
 	sprintf(errorBuffer, errorString, file_error);
 	perror(errorBuffer);
