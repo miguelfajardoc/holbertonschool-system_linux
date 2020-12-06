@@ -6,9 +6,9 @@
  * @flags: the pointer of the flags
  * @flags_amount: the cuatity of flags
  * @buf: the buffer with the data of the file
- * Return: 1 on suces, -1 otherwise
+ * Return: 1 on one activated, 0 otherwise
  */
-void printls(struct dirent *read, char *flags,
+int  printls(struct dirent *read, char *flags,
 	     int flags_amount, struct stat buf)
 {
 	int i;
@@ -43,4 +43,6 @@ void printls(struct dirent *read, char *flags,
 		else
 			printf(" ");
 	}
+
+	return (one);
 }

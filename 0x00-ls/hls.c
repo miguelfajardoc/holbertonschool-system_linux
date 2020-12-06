@@ -87,6 +87,7 @@ int read_file(DIR *dir, char *dir_name, char *flags, int flags_amount)
 	char *buffer;
 	char *full_name = dir_name;
 	int error;
+	int new_line = 0;
 
 	buffer = malloc(512);
 	if (buffer == NULL)
@@ -107,10 +108,11 @@ int read_file(DIR *dir, char *dir_name, char *flags, int flags_amount)
 			free(buffer);
 			return (0);
 		}
-		printls(read, flags, flags_amount, buf);
+		new_line = printls(read, flags, flags_amount, buf);
 		read = readdir(dir);
 	}
-	printf("\n");
+	if (!new_line)
+		printf("\n");
 	free(buffer);
 	return (1);
 }

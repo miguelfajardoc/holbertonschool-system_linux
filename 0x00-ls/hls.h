@@ -21,7 +21,7 @@ int open_directories(char *flags, char **files, int flags_amount,
 		     int files_amount);
 void error_handler(int _errno, char *file_error);
 int check_for_flags(char *flags, int argc, char **argv);
-void printls(struct dirent *read, char *flags, int flags_amount,
+int printls(struct dirent *read, char *flags, int flags_amount,
 	     struct stat buf);
 
 #endif /* HLS_HEADER */
