@@ -6,75 +6,67 @@
  * @argv: the pointer of the arguments
  * Return: 1 on suces, -1 otherwise
  */
-
 int main(int argc, char **argv)
 {
-	DIR *dir;
-	char *directory;
-	int files_position[50];
+	char *flags;
+	char **files;
+	int flags_amount = 0;
+	int files_amount = 0;
 	int result;
 
-	if (argc <= 1)
-	{
-		directory = ".";
-		dir = opendir(directory);
-		if (dir == NULL)
-		{
-			return (0);
-		}
-		read_file(dir, directory);
-		closedir(dir);
-	}
-	else
-	{
-		check_for_files(files_position, argv, argc);
-		result = open_directories(argc, argv, files_position);
-	}
+	files = malloc(sizeof(char **) * argc);
+	flags = malloc(sizeof(char *) * argc);
+
+	flags_amount = check_for_flags(flags, argc, argv);
+	files_amount = check_for_files(files, argv, argc);
+	result = open_directories(flags, files, flags_amount, files_amount);
+
+	free(files);
+	free(flags);
 	return (result);
 }
+
 /**
  * open_directories - this function open the directories to read from the argv
  * and the files_position.
- * @argv: the pointer that points the input arguments
- * @argc: the amount of arguments of argv
- * @files_position: pointer to an array of integers to fill where a directory
- * or file name is found
+ * @flags: the pointer that points to the flags
+ * @files: the pointer that points to the files or directories
+ * @flags_amount: the amount of flags
+ * @files_amount: the amount of directories or files to list
  * Return: 1 on sucess, 0 otherwise
  */
-int open_directories(int argc, char **argv, int *files_position)
+int open_directories(char *flags, char **files, int flags_amount,
+		     int files_amount)
 {
 	DIR *dir;
 	int files_i;
 	char *directory;
 	int error;
 
-	for (files_i = 1; files_i < argc; files_i++)
+	for (files_i = 0; files_i < files_amount; files_i++)
 	{
-		if (files_position[files_i] != 0)
+		directory = files[files_i];
+		dir = opendir(directory);
+		error = errno;
+		if (dir == NULL)
 		{
-			directory = argv[files_i];
-			dir = opendir(directory);
-			error = errno;
-			if (dir == NULL)
-			{
-				if (error == ENOTDIR)
-					printf("%s\n", directory);
-				else
-				{
-					error_handler(error, directory);
-				}
-			}
+			if (error == ENOTDIR)
+				printf("%s\n", directory);
 			else
 			{
-				if (argc > 2)
-					printf("%s:\n", directory);
-				read_file(dir, directory);
+				error_handler(error, directory);
 			}
-			closedir(dir);
 		}
-		if (files_i + 1 < argc)
-			printf("\n");
+		else
+		{
+			if (files_amount > 1)
+				printf("%s:\n", directory);
+			read_file(dir, directory, flags, flags_amount);
+		}
+		closedir(dir);
 	}
+	/* if (files_i + 1 < argc) */
+/*	printf("\n"); */
 	return (1);
 }
 
@@ -83,15 +75,18 @@ int open_directories(int argc, char **argv, int *files_position)
  * to sended flags, if any
  * @dir: the DIR pointer that contains the stream of de directory
  * @dir_name: the name of the directory
+ * @flags: the flags to format the data of the ls
+ * @flags_amount: the amount of flags founded as argumments
  * Return: 1 on succes, other if any error found
  */
-int read_file(DIR *dir, char *dir_name)
+int read_file(DIR *dir, char *dir_name, char *flags, int flags_amount)
 {
 	struct stat buf;
 	int stat_response;
 	struct dirent *read;
-	char *buffer, *errorBuffer;
+	char *buffer;
 	char *full_name = dir_name;
+	int error;
 
 	buffer = malloc(512);
 	if (buffer == NULL)
@@ -105,26 +100,17 @@ int read_file(DIR *dir, char *dir_name)
 			full_name = buffer;
 		}
 		stat_response = lstat(full_name, &buf);
+		error = errno;
 		if (stat_response != 0)
 		{
-			errorBuffer = malloc(512);
-			sprintf(errorBuffer, "hls: cannot access %s",
-				buffer);
-			perror(errorBuffer);
-			free(errorBuffer), free(buffer);
+			error_handler(error, buffer);
+			free(buffer);
 			return (0);
 		}
-		if (_strncmp(read->d_name, ".", 1) &&
-		    _strncmp(read->d_name, "..", 2))
-		{
-			printf("%s", read->d_name);
-			if (read != NULL)
-				printf(" ");
-		}
+		printls(read, flags, flags_amount, buf);
 		read = readdir(dir);
 	}
 	printf("\n");
 	free(buffer);
 	return (1);
 }
-
