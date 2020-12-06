@@ -64,9 +64,9 @@ int open_directories(char *flags, char **files, int flags_amount,
 			read_file(dir, directory, flags, flags_amount);
 		}
 		closedir(dir);
+		if (files_i + 1 < files_amount)
+			printf("\n");
 	}
-	/* if (files_i + 1 < argc) */
-/*	printf("\n"); */
 	return (1);
 }
 
