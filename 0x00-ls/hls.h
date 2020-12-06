@@ -15,9 +15,13 @@
 #include <grp.h>
 
 int _strncmp(char *s1, char *s2, int n);
-void check_for_files(int *files_position, char **argv, int argc);
-int read_file(DIR *dir, char *dir_name);
-int open_directories(int argc, char **argv, int *files_position);
+int check_for_files(char **files_position, char **argv, int argc);
+int read_file(DIR *dir, char *dir_name, char *flags, int flags_amount);
+int open_directories(char *flags, char **files, int flags_amount,
+		     int files_amount);
 void error_handler(int _errno, char *file_error);
+int check_for_flags(char *flags, int argc, char **argv);
+void printls(struct dirent *read, char *flags, int flags_amount,
+	     struct stat buf);
 
 #endif /* HLS_HEADER */
