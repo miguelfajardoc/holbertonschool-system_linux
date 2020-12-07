@@ -46,3 +46,39 @@ int  printls(struct dirent *read, char *flags,
 
 	return (one);
 }
+
+/**
+ * printfiles - the printls formatter for files
+ * @read: the data of the file to print
+ * @flags: the pointer of the flags
+ * @flags_amount: the cuatity of flags
+ * @buf: the buffer with the data of the file
+ * Return: 1 on one activated, 0 otherwise
+ */
+int  printfiles(char *flags, char **files, int *data_amount)
+{
+	int i;
+	int one = 0;
+
+	if (flags != NULL)
+	{
+		for (i = 0; i < data_amount[0]; i++)
+		{
+			if (flags[i] == '1')
+				one = 1;
+		}
+	}
+	for (i = 0; i < data_amount[1]; i++)
+	{
+		printf("%s", files[i]);
+		if (i + 1 != data_amount[1])
+		{
+			if (one)
+				printf("\n");
+			else
+				printf(" ");
+		}
+	}
+	printf("\n\n");
+	return (one);
+}

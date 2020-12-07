@@ -10,19 +10,24 @@ int main(int argc, char **argv)
 {
 	char *flags;
 	char **files;
-	int flags_amount = 0;
-	int files_amount = 0;
+	char **directories;
+	int data_amount[3];
 	int result;
 
 	files = malloc(sizeof(char **) * argc);
 	flags = malloc(sizeof(char *) * argc);
+	directories = malloc(sizeof(char **) * argc);
 
-	flags_amount = check_for_flags(flags, argc, argv);
-	files_amount = check_for_files(files, argv, argc);
-	result = open_directories(flags, files, flags_amount, files_amount);
+	check_for_data(flags, files, directories, argv, argc, data_amount);
+	if (data_amount[1] > 0)
+		printfiles(flags, files, data_amount);
+	/* flags_amount = check_for_flags(flags, argc, argv); */
+	/* files_amount = check_for_files(files, argv, argc); */
+	result = open_directories(flags, directories, data_amount);
 
 	free(files);
 	free(flags);
+	free(directories);
 	return (result);
 }
 
@@ -30,41 +35,36 @@ int main(int argc, char **argv)
  * open_directories - this function open the directories to read from the argv
  * and the files_position.
  * @flags: the pointer that points to the flags
- * @files: the pointer that points to the files or directories
- * @flags_amount: the amount of flags
- * @files_amount: the amount of directories or files to list
+ * @directories: the pointer that points to the files or directories
+ * @data_amount: the amount of directories or files to list
  * Return: 1 on sucess, 0 otherwise
  */
-int open_directories(char *flags, char **files, int flags_amount,
-		     int files_amount)
+int open_directories(char *flags, char **directories, int *data_amount)
 {
 	DIR *dir;
-	int files_i;
+	int iter;
 	char *directory;
 	int error;
 
-	for (files_i = 0; files_i < files_amount; files_i++)
+	for (iter = 0; iter < data_amount[2]; iter++)
 	{
-		directory = files[files_i];
+		directory = directories[iter];
 		dir = opendir(directory);
 		error = errno;
 		if (dir == NULL)
 		{
-			if (error == ENOTDIR)
-				printf("%s\n", directory);
-			else
-			{
-				error_handler(error, directory);
-			}
+			error_handler(error, directory);
 		}
 		else
 		{
-			if (files_amount > 1)
+			if (data_amount[2] > 1 || data_amount[1] > 0)
+			{
 				printf("%s:\n", directory);
-			read_file(dir, directory, flags, flags_amount);
+			}
+			read_file(dir, directory, flags, data_amount[0]);
 		}
 		closedir(dir);
-		if (files_i + 1 < files_amount)
+		if (iter + 1 < data_amount[2])
 			printf("\n");
 	}
 	return (1);
