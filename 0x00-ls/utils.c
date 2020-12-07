@@ -16,7 +16,7 @@
 int check_for_data(char *flags, char **files, char **directories, char **argv,
 		   int argc, int *data_amount)
 {
-	int p_iter, w_iter, error;
+	int p_iter, w_iter, error, error_count = 0;
 	int flags_iter = 0, files_iter = 0, directories_iter = 0;
 	DIR *dir_test;
 
@@ -42,6 +42,7 @@ int check_for_data(char *flags, char **files, char **directories, char **argv,
 			}
 			else
 			{
+				error_count++;
 				if (error == ENOTDIR)
 				{
 					files[files_iter] = argv[p_iter];
@@ -52,7 +53,7 @@ int check_for_data(char *flags, char **files, char **directories, char **argv,
 			}
 		}
 	}
-	if (directories_iter == 0)
+	if (directories_iter == 0 && error_count == 0)
 	{
 		directories[directories_iter] = ".";
 		directories_iter++;
