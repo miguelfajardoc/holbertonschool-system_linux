@@ -9,32 +9,23 @@
 void race_state(int *id, size_t size)
 {
 	static int *id_in_race;
-	static int laps[592];
-	static int competitors;
-	int i, j;
-	int exist = 0;
+	static int laps[592], competitors;
+	int i, j, exist = 0, amount_sort = 0;
 	int to_sort_b[100];
-	int amount_sort = 0;
-	int *sorted_new;
-	int *sorted;
+	int *sorted_new, *sorted;
 
-	if (size == 0 && id_in_race != NULL)
+	if (size == 0)
 	{
-		free(id_in_race);
-		memset(laps, 0, sizeof(laps));
+		free(id_in_race), memset(laps, 0, sizeof(laps));
 		competitors = 0;
 		return;
 	}
-
 	for (i = 0; i < (int)size; i++)
 	{
 		for (j = 0; j < competitors; j++)
 		{
 			if (id[i] == id_in_race[j])
-			{
-				laps[id_in_race[j]]++;
-				exist = 1;
-			}
+				laps[id_in_race[j]]++, exist = 1;
 		}
 		if (!exist)
 		{
@@ -47,19 +38,16 @@ void race_state(int *id, size_t size)
 	sorted_new = malloc(sizeof(int) * amount_sort);
 	mergeSort(to_sort_b, amount_sort, sorted_new);
 	sorted = malloc(sizeof(int) * (competitors + amount_sort));
-
 	sort2sorted_arrays(sorted_new, id_in_race, amount_sort,
 			     competitors, sorted);
 	competitors += amount_sort;
 	printf("Race state:\n");
+	if (id_in_race != NULL)
+		free(id_in_race);
 	id_in_race = malloc(sizeof(int) * (competitors));
 	memcpy(id_in_race, sorted, sizeof(int) * competitors);
-
-	for (j = 0; j < competitors; j++)
-	{
-		printf("Car %d [%d laps]\n", id_in_race[j],
-		       laps[id_in_race[j]]);
-	}
+	free(sorted_new), free(sorted);
+	print_cars(id_in_race, laps, competitors);
 }
 
 
@@ -71,19 +59,14 @@ void race_state(int *id, size_t size)
  */
 void mergeSort(int *data, int size, int *data_sorted)
 {
-	int half_right, half_left;
-	int complement = 0;
-	int *data_left;
-	int *data_right;
-	int *sorted_left;
-	int *sorted_right;
+	int half_right, half_left, complement = 0;
+	int *data_left, *data_right, *sorted_left, *sorted_right;
 
 	if (size > 2)
 	{
 		if (size % 2 != 0)
 			complement = 1;
-		half_left = size / 2 + complement;
-		half_right = size / 2;
+		half_left = size / 2 + complement, half_right = size / 2;
 		data_left = malloc(sizeof(int) * half_left);
 		sorted_left = malloc(sizeof(int) * half_left);
 		data_right = malloc(sizeof(int) * half_right);
@@ -164,4 +147,21 @@ void print_arrays(int *array, int size)
 	for (i = 0; i < size; i++)
 		printf("%d ", array[i]);
 	printf("/n");
+}
+
+/**
+ * print_cars - function that prints an array of cars and laps
+ * @id_in_race: id of the carrs in race
+ * @laps: rray of laps
+ * @competitors: the amount of competitors
+ */
+void print_cars(int *id_in_race, int *laps, int competitors)
+{
+	int j;
+
+	for (j = 0; j < competitors; j++)
+	{
+		printf("Car %d [%d laps]\n", id_in_race[j],
+		       laps[id_in_race[j]]);
+	}
 }
