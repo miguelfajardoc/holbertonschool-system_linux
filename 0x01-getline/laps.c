@@ -17,7 +17,8 @@ void race_state(int *id, size_t size)
 	memset(to_sort_b, 0, sizeof(to_sort_b));
 	if (size == 0)
 	{
-		free(id_in_race), memset(laps, 0, sizeof(laps));
+		free(id_in_race);
+		memset(laps, 0, sizeof(laps) * 1);
 		competitors = 0;
 		return;
 	}
