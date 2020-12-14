@@ -11,10 +11,9 @@ void race_state(int *id, size_t size)
 	static int *id_in_race;
 	static int laps[2592], competitors;
 	int i, j, exist = 0, amount_sort = 0;
-	int to_sort_b[100];
-	int *sorted_new, *sorted;
+	int to_sort_b[100], *sorted_new, *sorted;
 
-	memset(to_sort_b, 0, sizeof(to_sort_b));
+	memset(to_sort_b, 0, sizeof(to_sort_b) * 1);
 	if (size == 0)
 	{
 		free(id_in_race), memset(laps, 0, sizeof(laps) * 1);
@@ -68,14 +67,11 @@ void mergeSort(int *data, int size, int *data_sorted)
 		if (size % 2 != 0)
 			complement = 1;
 		half_left = (size / 2) + complement, half_right = size / 2;
-		if (half_right != 0)
-		{
-			data_right = malloc(sizeof(int) * half_right);
-			sorted_right = malloc(sizeof(int) * half_right);
-			memcpy(data_right, data + half_left,
-			       sizeof(int) * half_right);
-			mergeSort(data_right, half_right, sorted_right);
-		}
+		data_right = malloc(sizeof(int) * half_right);
+		sorted_right = malloc(sizeof(int) * half_right);
+		memcpy(data_right, data + half_left,
+		       sizeof(int) * half_right);
+		mergeSort(data_right, half_right, sorted_right);
 		data_left = malloc(sizeof(int) * half_left);
 		sorted_left = malloc(sizeof(int) * half_left);
 		memcpy(data_left, data, sizeof(int) * half_left);
@@ -95,8 +91,7 @@ void mergeSort(int *data, int size, int *data_sorted)
 			{
 				data_sorted[0] = data[0];
 				data_sorted[1] = data[1];
-			}
-			else
+			} else
 			{
 				data_sorted[0] = data[1];
 				data_sorted[1] = data[0];
