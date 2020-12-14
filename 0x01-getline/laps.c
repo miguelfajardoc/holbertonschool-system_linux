@@ -18,6 +18,14 @@ void race_state(int *id, size_t size)
 	int *sorted_new;
 	int *sorted;
 
+	if (size == 0 && id_in_race != NULL)
+	{
+		free(id_in_race);
+		memset(laps, 0, sizeof(laps));
+		competitors = 0;
+		return;
+	}
+
 	for (i = 0; i < (int)size; i++)
 	{
 		for (j = 0; j < competitors; j++)
@@ -30,22 +38,24 @@ void race_state(int *id, size_t size)
 		}
 		if (!exist)
 		{
-			/* id_in_race[competitors] = id[i]; */
 			printf("Car %d joined the race\n", id[i]);
 			to_sort_b[amount_sort] = id[i];
 			amount_sort++;
 		}
 		exist = 0;
 	}
-	competitors = amount_sort;
 	sorted_new = malloc(sizeof(int) * amount_sort);
 	mergeSort(to_sort_b, amount_sort, sorted_new);
 	sorted = malloc(sizeof(int) * (competitors + amount_sort));
-	sort2sorted_arrays(sorted, id_in_race, amount_sort,
-			     competitors + amount_sort, sorted);
+
+	sort2sorted_arrays(sorted_new, id_in_race, amount_sort,
+			     competitors, sorted);
+	competitors += amount_sort;
 	printf("Race state:\n");
-	id_in_race = sorted;
-	for ( j = 0; j < competitors; j++)
+	id_in_race = malloc(sizeof(int) * (competitors));
+	memcpy(id_in_race, sorted, sizeof(int) * competitors);
+
+	for (j = 0; j < competitors; j++)
 	{
 		printf("Car %d [%d laps]\n", id_in_race[j],
 		       laps[id_in_race[j]]);
@@ -54,10 +64,10 @@ void race_state(int *id, size_t size)
 
 
 /**
- * sort - function that sorts an array of ints
- * @id: is an array of int representing the “identifier” of each number.
+ * mergeSort - function that sorts an array of ints
+ * @data: is an array of int representing the “identifier” of each number.
  * @size: is the size of this array
- * @sorted: the pointer with the buffer of the data to be sorted
+ * @data_sorted: the pointer with the buffer of the data to be sorted
  */
 void mergeSort(int *data, int size, int *data_sorted)
 {
@@ -82,12 +92,13 @@ void mergeSort(int *data, int size, int *data_sorted)
 		memcpy(data_right, data + half_left, sizeof(int) * half_right);
 		mergeSort(data_left, half_left, sorted_left);
 		mergeSort(data_right, half_right, sorted_right);
-		sort2sorted_arrays(sorted_left, sorted_right, half_left, half_right,
-				   data_sorted);
+		sort2sorted_arrays(sorted_left, sorted_right, half_left,
+				   half_right, data_sorted);
 		free(data_right), free(data_left), free(sorted_right);
 		free(sorted_left);
 	}
-	else{
+	else
+	{
 		if (size == 1)
 			data_sorted[0] = data[0];
 		else
@@ -107,8 +118,15 @@ void mergeSort(int *data, int size, int *data_sorted)
 	}
 }
 
-
-void sort2sorted_arrays(int * sorted_left, int *sorted_right, int size_left,
+/**
+ * sort2sorted_arrays - function that sort to sorted arrays
+ * @sorted_left: the first array.
+ * @sorted_right: the second array
+ * @size_left: the size of the left
+ * @size_right: the size of the right
+ * @data_sorted: the pointer of the data that is saved
+ */
+void sort2sorted_arrays(int *sorted_left, int *sorted_right, int size_left,
 			int size_right, int *data_sorted)
 {
 	int iterl = 0;
@@ -118,8 +136,9 @@ void sort2sorted_arrays(int * sorted_left, int *sorted_right, int size_left,
 
 	while (i < total_size)
 	{
-		if(iterl < size_left &&
-		   (iterr >=size_right || sorted_left[iterl] <= sorted_right[iterr]))
+		if (iterl < size_left &&
+		    (iterr >= size_right ||
+		     sorted_left[iterl] <= sorted_right[iterr]))
 		{
 			data_sorted[i] = sorted_left[iterl];
 			iterl++;
@@ -131,4 +150,18 @@ void sort2sorted_arrays(int * sorted_left, int *sorted_right, int size_left,
 		}
 		i++;
 	}
+}
+
+/**
+ * print_arrays - function that prints an array of integers
+ * @array: is an array of int .
+ * @size: is the size of this array
+ */
+void print_arrays(int *array, int size)
+{
+	int i;
+
+	for (i = 0; i < size; i++)
+		printf("%d ", array[i]);
+	printf("/n");
 }
