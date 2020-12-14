@@ -9,7 +9,7 @@
 void race_state(int *id, size_t size)
 {
 	static int *id_in_race;
-	static int laps[2592], competitors;
+	static int laps[12592], competitors;
 	int i, j, exist = 0, amount_sort = 0;
 	int to_sort_b[100];
 	int *sorted_new, *sorted;
