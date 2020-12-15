@@ -26,7 +26,8 @@ char *_getline(const int fd)
 				      READ_SIZE - 1 - in_buffer);
 			if (result == 0 || result == -1)
 			{
-				free(buf), return (NULL);
+				free(buf);
+				return (NULL);
 			}
 			if (in_buffer)
 			{
@@ -36,8 +37,7 @@ char *_getline(const int fd)
 		}
 		new_line_pos = check_newline(buf, &found);
 		if (!found)
-		{
-			aux_buff = malloc(sizeof(char) * new_line_pos);
+		{	aux_buff = malloc(sizeof(char) * new_line_pos);
 			strcpy(aux_buff, buf), in_buffer = new_line_pos - 1;
 		}
 		else
