@@ -14,11 +14,10 @@ char *_getline(const int fd)
 	buf = malloc(sizeof(char) * (READ_SIZE));
 	memset(buf, '\0', READ_SIZE);
 	result = read(fd, buf, READ_SIZE - 1);
-	printf("result: %d\n", result);
 	if (result == 0 || result == -1)
 	{
 		free(buf);
-		return NULL;
+		return (NULL);
 	}
-	return buf;
+	return (buf);
 }
