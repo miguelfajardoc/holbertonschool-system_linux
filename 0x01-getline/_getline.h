@@ -1,7 +1,7 @@
 #ifndef _GETLINE
 #define _GETLINE
 
-#define READ_SIZE 128
+#define READ_SIZE 142
 
 #include <unistd.h>
 #include <stdio.h>
